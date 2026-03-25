@@ -203,7 +203,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       children: [
                         const SizedBox(height: 40),
@@ -224,7 +224,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 _buildSecurityFooter(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 _buildNumpad(),
                 const SizedBox(height: 8),
               ],
@@ -385,66 +385,81 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     );
   }
 
+  // ✅ FIXED: Uses LayoutBuilder to calculate responsive cell width
   Widget _buildOtpCells() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(otpLength, (i) {
-        final isActive = i == _activeIndex;
-        final isFilled = _digits[i].isNotEmpty;
-        return GestureDetector(
-          onTap: () => setState(() => _activeIndex = i),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 50,
-            height: 60,
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              color: isFilled ? const Color(0xFF1C2D58) : AppColors.bgInput,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: _hasError
-                    ? AppColors.red
-                    : isActive
-                    ? AppColors.bluePri
-                    : isFilled
-                    ? AppColors.accent.withOpacity(.4)
-                    : AppColors.accent.withOpacity(.18),
-                width: isActive ? 2 : 1.5,
-              ),
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                        color: AppColors.blueGlow,
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : _hasError
-                  ? [
-                      BoxShadow(
-                        color: AppColors.red.withOpacity(.2),
-                        blurRadius: 12,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Center(
-              child: isFilled
-                  ? Text(
-                      _digits[i],
-                      style: GoogleFonts.syne(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textHi,
-                      ),
-                    )
-                  : isActive
-                  ? _BlinkingCursor()
-                  : const SizedBox.shrink(),
-            ),
-          ).animate(target: _hasError ? 1 : 0).shake(duration: 300.ms),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const double horizontalMarginPerCell = 10.0; // 5px each side
+        final double totalMargin = horizontalMarginPerCell * otpLength;
+        final double cellWidth =
+            ((constraints.maxWidth - totalMargin) / otpLength).clamp(
+              36.0,
+              56.0,
+            );
+        final double cellHeight = cellWidth * 1.2;
+        final double fontSize = cellWidth * 0.46;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(otpLength, (i) {
+            final isActive = i == _activeIndex;
+            final isFilled = _digits[i].isNotEmpty;
+            return GestureDetector(
+              onTap: () => setState(() => _activeIndex = i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: cellWidth,
+                height: cellHeight,
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: isFilled ? const Color(0xFF1C2D58) : AppColors.bgInput,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _hasError
+                        ? AppColors.red
+                        : isActive
+                        ? AppColors.bluePri
+                        : isFilled
+                        ? AppColors.accent.withOpacity(.4)
+                        : AppColors.accent.withOpacity(.18),
+                    width: isActive ? 2 : 1.5,
+                  ),
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: AppColors.blueGlow,
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          ),
+                        ]
+                      : _hasError
+                      ? [
+                          BoxShadow(
+                            color: AppColors.red.withOpacity(.2),
+                            blurRadius: 12,
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Center(
+                  child: isFilled
+                      ? Text(
+                          _digits[i],
+                          style: GoogleFonts.syne(
+                            fontSize: fontSize,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textHi,
+                          ),
+                        )
+                      : isActive
+                      ? _BlinkingCursor()
+                      : const SizedBox.shrink(),
+                ),
+              ).animate(target: _hasError ? 1 : 0).shake(duration: 300.ms),
+            );
+          }),
         );
-      }),
+      },
     );
   }
 
@@ -511,8 +526,10 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildResendRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 6,
       children: [
         Text(
           "DIDN'T RECEIVE THE CODE?",
@@ -523,7 +540,6 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
             letterSpacing: 1.2,
           ),
         ),
-        const SizedBox(width: 10),
         GestureDetector(
           onTap: _canResend ? _resend : null,
           child: Text(
@@ -535,11 +551,9 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text('|', style: TextStyle(color: AppColors.textLo)),
-        ),
+        Text('|', style: TextStyle(color: AppColors.textLo)),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.timer_outlined, color: AppColors.orange, size: 14),
             const SizedBox(width: 4),
@@ -587,6 +601,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     );
   }
 
+  // ✅ FIXED: All keys use Expanded — no fixed widths
   Widget _buildNumpad() {
     return Container(
       decoration: const BoxDecoration(
@@ -597,47 +612,45 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: ['1', '2', '3', '4', '5'].map((d) => _numKey(d)).toList(),
           ),
           const SizedBox(height: 6),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ...['6', '7', '8', '9'].map((d) => _numKey(d)),
               _delKey(),
             ],
           ),
           const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [_numKey('0', wide: true), _doneKey()],
-          ),
+          Row(children: [_numKey('0', flex: 3), _doneKey(flex: 2)]),
         ],
       ),
     );
   }
 
-  Widget _numKey(String d, {bool wide = false}) {
-    return GestureDetector(
-      onTap: () => _kbInput(d),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        width: wide ? 100 : 58,
-        height: 46,
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        decoration: BoxDecoration(
-          color: const Color(0xFF253058),
-          borderRadius: BorderRadius.circular(9),
-          border: Border.all(color: AppColors.accent.withOpacity(.12)),
-        ),
-        child: Center(
-          child: Text(
-            d,
-            style: GoogleFonts.syne(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textHi,
+  // ✅ FIXED: Uses Expanded with flex instead of fixed width
+  Widget _numKey(String d, {int flex = 1}) {
+    return Expanded(
+      flex: flex,
+      child: GestureDetector(
+        onTap: () => _kbInput(d),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          height: 46,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            color: const Color(0xFF253058),
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: AppColors.accent.withOpacity(.12)),
+          ),
+          child: Center(
+            child: Text(
+              d,
+              style: GoogleFonts.syne(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textHi,
+              ),
             ),
           ),
         ),
@@ -645,48 +658,53 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     );
   }
 
+  //  FIXED: Uses Expanded instead of fixed width
   Widget _delKey() {
-    return GestureDetector(
-      onTap: _kbDelete,
-      child: Container(
-        width: 58,
-        height: 46,
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E2B4A),
-          borderRadius: BorderRadius.circular(9),
-          border: Border.all(color: AppColors.accent.withOpacity(.12)),
-        ),
-        child: const Center(
-          child: Icon(
-            Icons.backspace_outlined,
-            color: AppColors.textHi,
-            size: 20,
+    return Expanded(
+      child: GestureDetector(
+        onTap: _kbDelete,
+        child: Container(
+          height: 46,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E2B4A),
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: AppColors.accent.withOpacity(.12)),
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.backspace_outlined,
+              color: AppColors.textHi,
+              size: 20,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _doneKey() {
-    return GestureDetector(
-      onTap: _verify,
-      child: Container(
-        width: 80,
-        height: 46,
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        decoration: BoxDecoration(
-          color: AppColors.bluePri.withOpacity(.25),
-          borderRadius: BorderRadius.circular(9),
-          border: Border.all(color: AppColors.bluePri.withOpacity(.3)),
-        ),
-        child: Center(
-          child: Text(
-            'Done',
-            style: GoogleFonts.dmSans(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.accent,
+  //  FIXED: Uses Expanded with flex instead of fixed width
+  Widget _doneKey({int flex = 1}) {
+    return Expanded(
+      flex: flex,
+      child: GestureDetector(
+        onTap: _verify,
+        child: Container(
+          height: 46,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            color: AppColors.bluePri.withOpacity(.25),
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: AppColors.bluePri.withOpacity(.3)),
+          ),
+          child: Center(
+            child: Text(
+              'Done',
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.accent,
+              ),
             ),
           ),
         ),
@@ -772,6 +790,7 @@ class _ToastWidgetState extends State<_ToastWidget>
     ToastType.error => AppColors.red,
     ToastType.info => AppColors.blueLight,
   };
+
   @override
   Widget build(BuildContext context) {
     return Positioned(
