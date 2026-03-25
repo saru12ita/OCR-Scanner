@@ -385,7 +385,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ✅ FIXED: Uses LayoutBuilder to calculate responsive cell width
+  //  FIXED: Uses LayoutBuilder to calculate responsive cell width
   Widget _buildOtpCells() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -601,7 +601,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ✅ FIXED: All keys use Expanded — no fixed widths
+  //  FIXED: All keys use Expanded — no fixed widths
   Widget _buildNumpad() {
     return Container(
       decoration: const BoxDecoration(
@@ -628,7 +628,7 @@ class _OtpScreenState extends State<OtpScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ✅ FIXED: Uses Expanded with flex instead of fixed width
+  //  FIXED: Uses Expanded with flex instead of fixed width
   Widget _numKey(String d, {int flex = 1}) {
     return Expanded(
       flex: flex,
