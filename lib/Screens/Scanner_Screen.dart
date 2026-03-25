@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../theme/app_colors.dart';
+import 'otp_screen.dart';
 import 'result_screen.dart';
 
 enum ScanMode { passport, document, idCard }
@@ -152,6 +153,27 @@ class _ScannerScreenState extends State<ScannerScreen>
           child: SlideTransition(
             position: Tween<Offset>(
               begin: const Offset(0, .04),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: a, curve: Curves.easeOut)),
+            child: child,
+          ),
+        ),
+        transitionDuration: const Duration(milliseconds: 350),
+      ),
+    );
+  }
+
+  // ✅ NEW: Navigate to OTP screen with smooth transition
+  void _goToOtp() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, a, b) => const OtpScreen(),
+        transitionsBuilder: (_, a, b, child) => FadeTransition(
+          opacity: CurvedAnimation(parent: a, curve: Curves.easeInOut),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(.05, 0),
               end: Offset.zero,
             ).animate(CurvedAnimation(parent: a, curve: Curves.easeOut)),
             child: child,
@@ -622,6 +644,7 @@ class _ScannerScreenState extends State<ScannerScreen>
     );
   }
 
+  // ✅ UPDATED: Added OTP tab to bottom nav
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
@@ -668,6 +691,8 @@ class _ScannerScreenState extends State<ScannerScreen>
             ),
           ),
           _navItem(Icons.grid_view_rounded, 'Gallery', onTap: _pickFromGallery),
+          // ✅ NEW: OTP tab
+          _navItem(Icons.shield_outlined, 'OTP', onTap: _goToOtp),
         ],
       ),
     );
