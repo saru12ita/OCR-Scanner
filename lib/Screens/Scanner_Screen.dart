@@ -163,7 +163,7 @@ class _ScannerScreenState extends State<ScannerScreen>
     );
   }
 
-  // ✅ NEW: Navigate to OTP screen with smooth transition
+  //  NEW: Navigate to OTP screen with smooth transition
   void _goToOtp() {
     Navigator.push(
       context,
@@ -644,7 +644,7 @@ class _ScannerScreenState extends State<ScannerScreen>
     );
   }
 
-  // ✅ UPDATED: Added OTP tab to bottom nav
+  //  UPDATED: Added OTP tab to bottom nav
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
@@ -691,7 +691,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             ),
           ),
           _navItem(Icons.grid_view_rounded, 'Gallery', onTap: _pickFromGallery),
-          // ✅ NEW: OTP tab
+          //  NEW: OTP tab
           _navItem(Icons.shield_outlined, 'OTP', onTap: _goToOtp),
         ],
       ),
@@ -720,7 +720,7 @@ class _ScannerScreenState extends State<ScannerScreen>
   }
 }
 
-// ─── Overlay painter (dims everything outside frame) ───
+//  Overlay painter (dims everything outside frame)
 class _OverlayPainter extends CustomPainter {
   final Rect frameRect;
   _OverlayPainter({required this.frameRect});

@@ -43,8 +43,8 @@ class SecureScanApp extends StatelessWidget {
           },
         ),
       ),
-      //  home: const ScannerScreen(),
-      home: const OtpScreen(),
+      home: const ScannerScreen(),
+      // home: const OtpScreen(),
     );
   }
 }
