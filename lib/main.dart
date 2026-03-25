@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ocr_setup/Screens/Scanner_Screen.dart';
 import 'package:ocr_setup/screens/otp_screen.dart';
 import 'theme/app_colors.dart';
 
@@ -42,6 +43,7 @@ class SecureScanApp extends StatelessWidget {
           },
         ),
       ),
+      //  home: const ScannerScreen(),
       home: const OtpScreen(),
     );
   }
